@@ -1,0 +1,67 @@
+@import './styles/colors.scss';
+
+#root {
+    height: 100%;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    background-color: $bg-main-color;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li.fulfilled {
+    text-decoration: line-through;
+}
+
+.container {
+    background-color: $bg-white-color;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 10px;
+}
+
+.task-enter {
+    display: flex;
+    flex-direction: column;
+    width: 325px;
+    margin: 0 auto;
+}
+
+.task-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+
+    button {
+        box-sizing: border-box;
+        width: 150px;
+        height: 35px;
+    }
+}
+
+.tasks-list {
+    margin-top: 25px;
+    background-color: $bg-lightgray-color;
+    border-radius: 10px;
+    padding: 5px 20px;
+    box-sizing: border-box;
+
+    ul {
+        margin: 0;
+    }
+}

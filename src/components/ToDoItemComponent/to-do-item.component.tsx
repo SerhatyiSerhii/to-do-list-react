@@ -2,7 +2,7 @@ import React from "react";
 import { ToDoItemPropsInterface } from "../../interfaces/to-do-item-props-interface";
 import { ToDoTaskInterface } from "../../interfaces/to-do-task-interface";
 
-export function ToDoItemComponent(props: ToDoItemPropsInterface): JSX.Element {
+export default function ToDoItemComponent(props: ToDoItemPropsInterface): JSX.Element {
     return (
         <React.Fragment>
             {

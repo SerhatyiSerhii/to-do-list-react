@@ -1,7 +1,7 @@
 import React from "react";
 import { ToDoStateInterface } from "../../interfaces/to-do-state-interface";
 import { ToDoTaskInterface } from "../../interfaces/to-do-task-interface";
-import { ToDoItemComponent } from "../ToDoItemComponent/to-do-item.component";
+import ToDoItemComponent from "../ToDoItemComponent/to-do-item.component";
 
 let uniqueIdNumber = 0;
 

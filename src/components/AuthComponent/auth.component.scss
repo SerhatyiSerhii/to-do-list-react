@@ -1,0 +1,38 @@
+.auth {
+    &-container {
+        width: 800px;
+        margin: 20px auto 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    &-input {
+        width: 200px;
+
+        label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &:nth-child(2) {
+            margin-top: 15px;
+        }
+    }
+
+    &-form-btns {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin-top: 15px;
+
+        .btns {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .btns-message {
+            align-self: center;
+            margin-bottom: 15px;
+        }
+    }
+}

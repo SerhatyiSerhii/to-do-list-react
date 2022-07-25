@@ -1,7 +1,1 @@
-[
-    {
-        "id": 1,
-        "name": "testUser",
-        "password": "$2b$10$djLOJQO1HtJ7ePf7DYw.KOrY3Z6oiC.wTQD4hP3uarQ/fgXFqU3Ou"
-    }
-]
+[{"id":1,"name":"testUser","password":"$2b$10$djLOJQO1HtJ7ePf7DYw.KOrY3Z6oiC.wTQD4hP3uarQ/fgXFqU3Ou","refreshToken":""}]

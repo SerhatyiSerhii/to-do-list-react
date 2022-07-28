@@ -8,6 +8,8 @@ export function AuthComponent() {
     const [nameErrors, setNameErrors] = useState<boolean | undefined>(true);
     const [passwordErrors, setPasswordErrors] = useState<boolean | undefined>(true);
     const [invalid, setInvalid] = useState<boolean>(true);
+    const [name, setName] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
 
     let navigate = useNavigate();
 
@@ -16,14 +18,25 @@ export function AuthComponent() {
     }, [nameErrors, passwordErrors]);
 
     const handleInput = (event: ChangeEvent<HTMLInputElement>): void => {
-        event.target.className === 'name-input' ?
-            setNameErrors(event.target.value.trim() ? false : true) :
+        if (event.target.className === 'name-input') {
+            setNameErrors(event.target.value.trim() ? false : true);
+            setName(event.target.value.trim());
+        } else {
             setPasswordErrors(event.target.value.trim() ? false : true);
+            setPassword(event.target.value.trim());
+        }
     }
 
     const handleSignIn = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {
         event?.preventDefault();
-        navigate('/list', { replace: true });
+        fetch('http://localhost:8080/auth', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name,
+                password
+            })
+        }).then(res => res.json()).then(() => navigate('/list', { replace: true }));
     }
 
     const handleSignUp = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {

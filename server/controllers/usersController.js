@@ -1,74 +1,85 @@
-const data = {
-    users: require('../model/users.json'),
-    setUsers: function (data) { this.users = data }
-}
+const User = require('../model/User');
 
-const getAllUsers = (req, res) => {
-    res.json(data.users);
-}
+const getAllUsers = async (req, res) => {
+    const users = await User.find();
 
-const createNewUser = (req, res) => {
-    const newUser = {
-        id: data.users[data.users.length - 1].id + 1 || 1,
-        name: req.body.name,
-        password: req.body.password,
+    if (!users) {
+        return res.status(204).json({'message': 'No users found.'});
     }
 
-    if (!isUserVaild(newUser)) {
-        return res.status(400).json({errorMessage: 'Some required fields are missed!'});
-    }
-
-    data.setUsers([...data.users, newUser]);
-    res.status(201).json(newUser);
+    res.json(users);
 }
 
-const updateUser = (req, res) => {
-    const user = data.users.find(user => user.id === +req.body.id);
+const createNewUser = async (req, res) => {
+    if (!req?.body?.name || !req?.body?.password) {
+        return res.status(400).json({'message': 'Some required fields are missed!'});
+    }
+
+    try {
+        const result = await User.create({
+            name: req.body.name,
+            password: req.body.password
+        });
+
+        res.status(201).json(result);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+const updateUser = async (req, res) => {
+    if (!req?.body?.id) {
+        return res.status(400).json({'message': 'Id parameter is required.'});
+    }
+
+    const user = await User.findOne({ _id: req.body.id }).exec();
 
     if (!user) {
-        return res.status(400).json({"message": `User ID ${req.body.id} not found`})
+        return res.status(204).json({"message": `No user matches ID ${req.body.id}.`});
     }
 
-    if (req.body.name) {
+    if (req.body?.name) {
         user.name = req.body.name;
     }
 
-    if (req.body.password) {
+    if (req.body?.password) {
         user.password = req.body.password;
     }
 
-    const filteredArr = data.users.filter(user => user.id !== +req.body.id);
-    const unsortedArr = [...filteredArr, user];
+    const result = await user.save();
 
-    data.setUsers(unsortedArr.sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0));
-    res.json(data.users);
+    res.json(result);
 }
 
-const deleteUser = (req, res) => {
-    const user = data.users.find(user => user.id === +req.body.id);
-
-    if (!user) {
-        return res.status(400).json({"message": `User ID ${req.body.id} not found`})
+const deleteUser = async (req, res) => {
+    if (!req?.body?.id) {
+        res.status(400).json({'message': 'User ID required.'});
     }
 
-    const filteredArr = data.users.filter(user => user.id !== +req.body.id);
-
-    data.setUsers([...filteredArr]);
-
-    res.json(data.users);
-}
-
-const getUser = (req, res) => {
-    const user = data.users.find(user => user.id === +req.params.id);
+    const user = await User.findOne({ _id: req.body.id }).exec();
 
     if (!user) {
-        return res.status(400).json({"message": `User ID ${req.params.id} not found`})
+        return res.status(204).json({"message": `No user matches ID ${req.body.id}.`});
+    }
+
+    const result = await user.deleteOne({ _id: req.body.id });
+
+    res.json(result);
+}
+
+const getUser = async (req, res) => {
+    if (!req?.params?.id) {
+        res.status(400).json({'message': 'User ID required.'});
+    }
+
+    const user = await User.findOne({ _id: req.params.id }).exec();
+
+    if (!user) {
+        return res.status(204).json({"message": `No user matches ID ${req.body.id}.`});
     }
 
     res.json(user);
 }
-
-const isUserVaild = (user) => Boolean(user.name) && Boolean(user.password);
 
 module.exports = {
     getAllUsers,

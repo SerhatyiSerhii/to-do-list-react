@@ -7,9 +7,9 @@ export default function ToDoItemComponent(props: ToDoItemPropsInterface): JSX.El
         <React.Fragment>
             {
                 props.listOfTasks.map((task: ToDoTaskInterface, index: number) => (
-                    <li key={task.taskId} className={task.taskCompleted ? 'fulfilled' : ''}>
-                        <input type='checkbox' onClick={(event) => props.onCheckboxClick(task.taskId, event)} />
-                        {`${index + 1} ${task.taskDescription}`}
+                    <li key={task._id} className={task.isFinished ? 'fulfilled' : ''}>
+                        <input type='checkbox' defaultChecked={task.isFinished} onChange={(event) => props.onCheckboxClick(task._id, event)} />
+                        {`${index + 1} ${task.toDo}`}
                     </li>
                 ))
             }

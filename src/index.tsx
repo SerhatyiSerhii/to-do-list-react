@@ -4,14 +4,17 @@ import { ToDoListComponent } from './components/ToDoListComponent/to-do-list.com
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.scss'
 import { AuthComponent } from './components/AuthComponent/auth.component';
+import { AuthProvider } from './context/AuthProvider';
 
 const rooter = ReactDom.createRoot(document.getElementById('root')!);
 rooter.render(
     <BrowserRouter>
-        <Routes>
-            <Route path='/' element={<AuthComponent />} />
-            <Route path='/sign-up' element={<AuthComponent />} />
-            <Route path='/list' element={<ToDoListComponent />}></Route>
-        </Routes>
+        <AuthProvider>
+            <Routes>
+                <Route path='/' element={<AuthComponent />} />
+                <Route path='/sign-up' element={<AuthComponent />} />
+                <Route path='/list' element={<ToDoListComponent />}></Route>
+            </Routes>
+        </AuthProvider>    
     </BrowserRouter>
 );

@@ -2,35 +2,20 @@ import React from "react";
 import { ToDoStateInterface } from "../../interfaces/to-do-state-interface";
 import { ToDoTaskInterface } from "../../interfaces/to-do-task-interface";
 import ToDoItemComponent from "../ToDoItemComponent/to-do-item.component";
+import AuthContext from "../../context/AuthProvider";
+import axios from "../../api/axios";
 
-let uniqueIdNumber = 0;
-
-function uniqueIdNumberGenerator(): number {
-    return uniqueIdNumber++;
-}
+const PUT_URL = '/users/';
 
 export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
+    static contextType = AuthContext;
+    context!: React.ContextType<typeof AuthContext>;
+
     constructor(props: {} | Readonly<{}>) {
         super(props);
 
         this.state = {
-            listOfTasks: [
-                {
-                    taskId: uniqueIdNumberGenerator(),
-                    taskDescription: 'Buy milk',
-                    taskCompleted: false,
-                },
-                {
-                    taskId: uniqueIdNumberGenerator(),
-                    taskDescription: 'Buy bread',
-                    taskCompleted: false,
-                },
-                {
-                    taskId: uniqueIdNumberGenerator(),
-                    taskDescription: 'Feed cat',
-                    taskCompleted: false,
-                },
-            ],
+            listOfTasks: [],
             inputValue: '',
         }
 
@@ -40,33 +25,67 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
         this.removeFulfilledToDoItems = this.removeFulfilledToDoItems.bind(this);
     };
 
-    addToDoItem(): void {
-        const listOfToDoItems = this.state.listOfTasks.slice();
-
-        const newToDoItem = {
-            taskId: uniqueIdNumberGenerator(),
-            taskDescription: this.state.inputValue,
-            taskCompleted: false,
-        }
-
-        listOfToDoItems.push(newToDoItem);
+    componentDidMount() {
+        const { auth } = this.context as any;
 
         this.setState({
-            listOfTasks: listOfToDoItems,
-            inputValue: ''
+            listOfTasks: auth.toDoList
         })
     }
 
-    removeFulfilledToDoItems(): void {
+    async addToDoItem(): Promise<void> {
+        try {
+            const result = await axios.put(
+                PUT_URL,
+                JSON.stringify({
+                    id: (this.context as any).auth.userId,
+                    toDoItem: { toDo: this.state.inputValue }
+                }),
+                {
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': 'Bearer ' + (this.context as any).auth.accessToken
+                    },
+                    withCredentials: true
+                }
+            );
+
+            this.setState({
+                listOfTasks: result.data.toDoList,
+                inputValue: ''
+            });
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    async removeFulfilledToDoItems(): Promise<void> {
         const listOfToDoItems = this.state.listOfTasks.slice();
 
-        const unfulfilledToDoItems = listOfToDoItems.filter((toDoItem: { taskCompleted: boolean; }) => {
-            return toDoItem.taskCompleted !== true;
-        });
+        const fulfilledToDoItems = listOfToDoItems.filter((toDoItem: ToDoTaskInterface) => {
+            return toDoItem.isFinished === true;
+        }).map((toDoItem: ToDoTaskInterface) => toDoItem._id);
 
-        this.setState({
-            listOfTasks: unfulfilledToDoItems,
-        })
+        try {
+            const result = await axios.put(
+                PUT_URL + (this.context as any).auth.userId,
+                JSON.stringify({
+                    toDoList: [...fulfilledToDoItems]
+                }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (this.context as any).auth.accessToken
+                    }
+                }
+            );
+
+            this.setState({
+                listOfTasks: result.data.toDoList
+            })
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     onInputChange(event: { target: { value: string | undefined } }): void {
@@ -77,20 +96,31 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
         });
     }
 
-    handleCheckboxClick(toDoItemId: number, event: React.MouseEvent<HTMLInputElement, MouseEvent>): void {
-        const listOfToDoItems = this.state.listOfTasks.slice();
+    async handleCheckboxClick(toDoItemId: number | undefined, event: React.ChangeEvent<HTMLInputElement>): Promise<void> {
+        try {
+            const result = await axios.put(
+                PUT_URL + (this.context as any).auth.userId,
+                JSON.stringify({
+                    finished: {
+                        id: toDoItemId,
+                        isFinished: event.target.checked
+                    }
+                }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (this.context as any).auth.accessToken
+                    },
+                    withCredentials: true
+                }
+            );
 
-        const updatedListOfTasks = listOfToDoItems.map((listItem: ToDoTaskInterface) => {
-            if (listItem.taskId === toDoItemId) {
-                listItem.taskCompleted = (event.target as HTMLInputElement).checked;
-            }
-
-            return listItem;
-        });
-
-        this.setState({
-            listOfTasks: updatedListOfTasks
-        });
+            this.setState({
+                listOfTasks: result.data.toDoList,
+            });
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     render(): JSX.Element {

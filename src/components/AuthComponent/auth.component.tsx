@@ -3,13 +3,19 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ButtonComponent from "../ButtonComponent/button.component";
 import InputsComponent from "../InputsComponent/inputs.component";
+import axios from "../../api/axios";
+import AuthContext from "../../context/AuthProvider";
+
+const AUTH_URL = '/auth';
 
 export function AuthComponent() {
+    const { setAuth }  = React.useContext(AuthContext) as any;
     const [nameErrors, setNameErrors] = useState<boolean | undefined>(true);
     const [passwordErrors, setPasswordErrors] = useState<boolean | undefined>(true);
     const [invalid, setInvalid] = useState<boolean>(true);
     const [name, setName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [accessToken, setAccessToken] = useState<string>('');
 
     let navigate = useNavigate();
 
@@ -27,16 +33,28 @@ export function AuthComponent() {
         }
     }
 
-    const handleSignIn = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {
+    const handleSignIn = async (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined) => {
         event?.preventDefault();
-        fetch('http://localhost:8080/auth', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                name,
-                password
-            })
-        }).then(res => res.json()).then(() => navigate('/list', { replace: true }));
+
+        try {
+            const result = await axios.post(AUTH_URL,
+                JSON.stringify({
+                    name,
+                    password
+                }),
+                {
+                    headers: {'Content-Type': 'application/json',},
+                    withCredentials: true
+                }
+            );
+            const accessToken = result.data.accessToken;
+            const toDoList = result.data.toDoList;
+            const userId = result.data.userId;
+            setAuth({name, password, accessToken, toDoList, userId});
+            navigate('/list', { replace: true });
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     const handleSignUp = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {

@@ -22,7 +22,8 @@ const handleNewUser = async (req, res) => {
         // create and store the new user
         await User.create({
             name: name,
-            password: hashedPwd
+            password: hashedPwd,
+            toDoList: [],
         });
 
         res.status(201).json({"message": `New user ${name} created!`});

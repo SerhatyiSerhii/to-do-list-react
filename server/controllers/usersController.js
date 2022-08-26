@@ -18,7 +18,8 @@ const createNewUser = async (req, res) => {
     try {
         const result = await User.create({
             name: req.body.name,
-            password: req.body.password
+            password: req.body.password,
+            toDoList: []
         });
 
         res.status(201).json(result);
@@ -44,6 +45,10 @@ const updateUser = async (req, res) => {
 
     if (req.body?.password) {
         user.password = req.body.password;
+    }
+
+    if (req.body?.toDoItem) {
+        user.toDoList = [...user.toDoList, {...req.body.toDoItem, isFinished: false}];
     }
 
     const result = await user.save();
@@ -75,10 +80,40 @@ const getUser = async (req, res) => {
     const user = await User.findOne({ _id: req.params.id }).exec();
 
     if (!user) {
-        return res.status(204).json({"message": `No user matches ID ${req.body.id}.`});
+        return res.status(204).json({"message": `No user matches ID ${req.params.id}.`});
     }
 
     res.json(user);
+}
+
+const updateToDoList = async (req, res) => {
+    if (!req?.params?.id) {
+        return res.status(400).json({'message': 'Id parameter is required.'});
+    }
+
+    const user = await User.findOne({ _id: req.params.id }).exec();
+
+    if (!user) {
+        return res.status(204).json({"message": `No user matches ID ${req.params.id}.`});
+    }
+
+    if (req.body?.toDoList) {
+        let updatedToDoList = user.toDoList;
+
+        req.body.toDoList.forEach(element => {
+            updatedToDoList = updatedToDoList.filter(item => item._id.toString() !== element);
+        });
+
+        user.toDoList = updatedToDoList;
+    }
+
+    if (req.body?.finished) {
+        user.toDoList.find(toDo => toDo._id.toString() === req.body.finished.id).isFinished = req.body.finished.isFinished;
+    }
+
+    const result = await user.save();
+
+    res.json(result);
 }
 
 module.exports = {
@@ -86,5 +121,6 @@ module.exports = {
     createNewUser,
     updateUser,
     deleteUser,
-    getUser
+    getUser,
+    updateToDoList
 }

@@ -27,7 +27,7 @@ const handleLogin = async (req, res) => {
             },
             process.env.ACCESS_TOKEN_SECRET,
             {
-                expiresIn: '30s'
+                expiresIn: '5m'
             }
         );
         const refreshToken = jwt.sign(
@@ -45,9 +45,9 @@ const handleLogin = async (req, res) => {
         const result = await foundUser.save();
         console.log(result);
 
-        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 }); // secure: true - only serves on https
+        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true }); // secure: true - only serves on https
 
-        res.json({ accessToken });
+        res.json({ accessToken, toDoList: result.toDoList, userId: result._id });
     } else {
         res.sendStatus(401);
     }

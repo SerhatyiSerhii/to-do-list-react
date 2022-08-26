@@ -10,5 +10,6 @@ router.route('/')
 
 router.route('/:id')
     .get(usersController.getUser)
+    .put(usersController.updateToDoList);
 
 module.exports = router;

@@ -10,6 +10,12 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    toDoList: [
+        {
+            toDo: String,
+            isFinished: Boolean
+        }
+    ],
     refreshToken: String
 });
 

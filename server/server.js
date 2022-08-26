@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 // and fetch cookies credentials requirement
 app.use(credentials);
 
-app.use(cors(corsOptions));
+app.use(cors({credentials: true, origin: corsOptions}));
 
 app.use(express.urlencoded({extended: false}));
 

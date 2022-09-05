@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.scss'
 import { AuthComponent } from './components/AuthComponent/auth.component';
 import { AuthProvider } from './context/AuthProvider';
+import RequireAuthComponent from './components/RequireAuthComponent/requireAuthComponent';
 
 const rooter = ReactDom.createRoot(document.getElementById('root')!);
 rooter.render(
@@ -13,8 +14,10 @@ rooter.render(
             <Routes>
                 <Route path='/' element={<AuthComponent />} />
                 <Route path='/sign-up' element={<AuthComponent />} />
-                <Route path='/list' element={<ToDoListComponent />}></Route>
+                <Route element={<RequireAuthComponent />}>
+                    <Route path='/list' element={<ToDoListComponent />} />
+                </Route>
             </Routes>
-        </AuthProvider>    
+        </AuthProvider>
     </BrowserRouter>
 );

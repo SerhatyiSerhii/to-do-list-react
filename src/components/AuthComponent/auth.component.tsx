@@ -14,7 +14,7 @@ export function AuthComponent() {
     const pwdRef = useRef();
     const checkPwdRef = useRef();
 
-    const { setAuth } = useAuth();
+    const { setAuth, persist, setPersist } = useAuth();
     const [nameErrors, setNameErrors] = useState<boolean | undefined>(true);
     const [passwordErrors, setPasswordErrors] = useState<boolean | undefined>(true);
     const [confirmPwd, setConfirmPwdErrors] = useState<boolean | undefined>(true);
@@ -130,6 +130,14 @@ export function AuthComponent() {
         }
     }
 
+    const togglePersist = () => {
+        setPersist((prev: any) => !prev);
+    }
+
+    useEffect(() => {
+        localStorage.setItem('persist', persist);
+    }, [persist]);
+
     return (
         <div className="auth-container">
             <form onSubmit={() => handleSignIn()}>
@@ -142,6 +150,10 @@ export function AuthComponent() {
                                 <div className="btns">
                                     <ButtonComponent handleClick={handleSignIn} invalid={invalid} text={'Sign in'} />
                                     <ButtonComponent handleClick={handleSignUp} text={'Sign up'} />
+                                </div>
+                                <div className="persist-check">
+                                    <input type="checkbox" id="persist" onChange={togglePersist} checked={persist}/>
+                                    <label htmlFor="persist">Trust this device</label>
                                 </div>
                             </React.Fragment> :
                             <React.Fragment>

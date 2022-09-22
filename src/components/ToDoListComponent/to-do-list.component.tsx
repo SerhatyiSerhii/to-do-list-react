@@ -20,6 +20,7 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
         this.onInputChange = this.onInputChange.bind(this);
         this.handleCheckboxClick = this.handleCheckboxClick.bind(this);
         this.removeFulfilledToDoItems = this.removeFulfilledToDoItems.bind(this);
+        this.handleSignOut = this.handleSignOut.bind(this);
     }
 
     componentDidMount() {
@@ -32,18 +33,22 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
 
     async addToDoItem(inputValue: string | undefined): Promise<void> {
         (this.props as any).addToDoItem(inputValue).then((response: any) => {
-            this.setState({
-                listOfTasks: response.data.toDoList,
-                inputValue: ''
-            });
+            if (response) {
+                this.setState({
+                    listOfTasks: response.data.toDoList,
+                    inputValue: ''
+                });
+            }            
         });
     }
 
     async removeFulfilledToDoItems(listOfTasks: ToDoTaskInterface[]): Promise<void> {
         (this.props as any).removeFulfilledToDoItems(listOfTasks).then((response: any) => {
-            this.setState({
-                listOfTasks: response.data.toDoList
-            });
+            if (response) {
+                this.setState({
+                    listOfTasks: response.data.toDoList
+                });
+            }            
         });
     }
 
@@ -69,6 +74,10 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
         }
     }
 
+    handleSignOut() {
+        (this.props as any).handleSignOut();
+    }
+
     render(): JSX.Element {
         return (
             <div className='container' >
@@ -85,6 +94,7 @@ export class ToDoListComponent extends React.Component<{}, ToDoStateInterface> {
                         <ToDoItemComponent listOfTasks={this.state.listOfTasks} onCheckboxClick={this.handleCheckboxClick} />
                     </ul>
                 </div>
+                <button onClick={() => this.handleSignOut()}>Sign out</button>
             </div>
         );
     }

@@ -36,7 +36,7 @@ const handleRefreshToken = async (req, res) => {
                 }
             );
 
-            res.json({ accessToken });
+            res.json({ accessToken, name: foundUser.name, toDoList: foundUser.toDoList, userId: foundUser._id });
         }
 
     ) 

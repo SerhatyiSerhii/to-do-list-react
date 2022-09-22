@@ -4,12 +4,14 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import AuthContext from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { ToDoTaskInterface } from "../../interfaces/to-do-task-interface";
+import useLogout from "../../hooks/useLogout";
 
 export default function ToDoListWithHookComponent(props: any): JSX.Element {
     const axiosPrivate = useAxiosPrivate();
     const context = useContext(AuthContext);
     const controller = new AbortController();
     const navigate = useNavigate();
+    const logOut = useLogout();
 
     const PUT_URL = '/users/';
 
@@ -38,7 +40,7 @@ export default function ToDoListWithHookComponent(props: any): JSX.Element {
                     withCredentials: true
                 }
             );
-    
+
             return result;
         } catch (err) {
             console.error(err);
@@ -101,5 +103,15 @@ export default function ToDoListWithHookComponent(props: any): JSX.Element {
         }
     }
 
-    return <ToDoListComponent {...props} handleCheckboxClick={handleCheckboxClick} addToDoItem={addToDoItem} removeFulfilledToDoItems={removeFulfilledToDoItems}/>
+    const handleSignOut = async (): Promise<void> => {
+        await logOut();
+        navigate('/', { replace: true });
+    }
+
+    return <ToDoListComponent
+            {...props}
+            handleCheckboxClick={handleCheckboxClick}
+            addToDoItem={addToDoItem}
+            removeFulfilledToDoItems={removeFulfilledToDoItems}
+            handleSignOut={handleSignOut}/>
 }

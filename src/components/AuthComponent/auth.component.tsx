@@ -5,6 +5,8 @@ import ButtonComponent from "../ButtonComponent/button.component";
 import InputsComponent from "../InputsComponent/inputs.component";
 import axios from "../../api/axios";
 import useAuth from "../../hooks/useAuth";
+import useInput from "../../hooks/useInput";
+import useToggle from "../../hooks/useToggle";
 
 const AUTH_URL = '/auth';
 const REGISTER_URL = '/register';
@@ -14,14 +16,16 @@ export function AuthComponent() {
     const pwdRef = useRef();
     const checkPwdRef = useRef();
 
-    const { setAuth, persist, setPersist } = useAuth();
+    const { setAuth } = useAuth();
     const [nameErrors, setNameErrors] = useState<boolean | undefined>(true);
     const [passwordErrors, setPasswordErrors] = useState<boolean | undefined>(true);
     const [confirmPwd, setConfirmPwdErrors] = useState<boolean | undefined>(true);
     const [invalid, setInvalid] = useState<boolean>(true);
-    const [name, setName] = useState<string>('');
+
+    const [name, resetName, userAttribs] = useInput('user', '');
     const [password, setPassword] = useState<string>('');
     const [checkPwd, setCheckPwd] = useState<string>('');
+    const [check, toggleCheck] = useToggle('persist', false);
 
     let navigate = useNavigate();
 
@@ -40,7 +44,7 @@ export function AuthComponent() {
     const handleInput = (event: ChangeEvent<HTMLInputElement>): void => {
         if (event.target.className === 'name-input') {
             setNameErrors(event.target.value.trim() ? false : true);
-            setName(event.target.value.trim());
+            userAttribs.onChange(event);
         } else if (event.target.className === 'password-input') {
             setPasswordErrors(event.target.value.trim() ? false : true);
             setPassword(event.target.value.trim());
@@ -76,7 +80,7 @@ export function AuthComponent() {
     const handleSignUp = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {
         event?.preventDefault();
 
-        setName('');
+        resetName();
         setNameErrors(true);
         setPassword('');
         setPasswordErrors(true);
@@ -90,7 +94,7 @@ export function AuthComponent() {
     const handleBackClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined): void => {
         event?.preventDefault();
 
-        setName('');
+        resetName();
         setNameErrors(true);
         setPassword('');
         setPasswordErrors(true);
@@ -130,18 +134,10 @@ export function AuthComponent() {
         }
     }
 
-    const togglePersist = () => {
-        setPersist((prev: any) => !prev);
-    }
-
-    useEffect(() => {
-        localStorage.setItem('persist', persist);
-    }, [persist]);
-
     return (
         <div className="auth-container">
             <form onSubmit={() => handleSignIn()}>
-                <InputsComponent handleChange={handleInput} nameRef={nameRef} pwdRef={pwdRef} checkPwdRef={checkPwdRef} />
+                <InputsComponent handleChange={handleInput} nameRef={nameRef} pwdRef={pwdRef} checkPwdRef={checkPwdRef} value={userAttribs.value}/>
                 <div className="auth-form-btns">
                     {
                         window.location.pathname === '/' ?
@@ -152,7 +148,7 @@ export function AuthComponent() {
                                     <ButtonComponent handleClick={handleSignUp} text={'Sign up'} />
                                 </div>
                                 <div className="persist-check">
-                                    <input type="checkbox" id="persist" onChange={togglePersist} checked={persist}/>
+                                    <input type="checkbox" id="persist" onChange={toggleCheck} checked={check}/>
                                     <label htmlFor="persist">Trust this device</label>
                                 </div>
                             </React.Fragment> :

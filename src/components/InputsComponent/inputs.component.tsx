@@ -7,13 +7,13 @@ export default function InputsComponent(props: ToDoInputInterface): JSX.Element 
             <div className="auth-input name">
                 <label>
                     User name
-                    <input className="name-input" type="text" onChange={(e) => props.handleChange(e)} ref={props.nameRef}></input>
+                    <input className="name-input" type="text" onChange={(e) => props.handleChange(e)} ref={props.nameRef} value={props.value}></input>
                 </label>
             </div>
             <div className="auth-input password">
                 <label>
                     User password
-                    <input className="password-input" type="text" onChange={(e) => props.handleChange(e)} ref={props.pwdRef}></input>
+                    <input className="password-input" type="password" onChange={(e) => props.handleChange(e)} ref={props.pwdRef}></input>
                 </label>
             </div>
 
@@ -22,7 +22,7 @@ export default function InputsComponent(props: ToDoInputInterface): JSX.Element 
                 <div className="auth-input confirm-password">
                     <label>
                         Confirm password
-                        <input className="confirm-password-input" type="text" onChange={(e) => props.handleChange(e)} ref={props.checkPwdRef}></input>
+                        <input className="confirm-password-input" type="password" onChange={(e) => props.handleChange(e)} ref={props.checkPwdRef}></input>
                     </label>
                 </div>
             }

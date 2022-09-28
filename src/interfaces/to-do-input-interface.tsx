@@ -5,4 +5,5 @@ export interface ToDoInputInterface {
     nameRef: any;
     pwdRef: any;
     checkPwdRef: any;
+    value: any;
 }

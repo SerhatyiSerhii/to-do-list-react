@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const handleLogin = async (req, res) => {
+    const cookies = req.cookies;
+    console.log(`cookie available at login: ${JSON.stringify(cookies)}`);
     const { name, password } = req.body;
 
     if (!name || !password) {
@@ -30,7 +32,7 @@ const handleLogin = async (req, res) => {
                 expiresIn: '5m'
             }
         );
-        const refreshToken = jwt.sign(
+        const newRefreshToken = jwt.sign(
             {
                 "name": foundUser.name
             },
@@ -40,12 +42,30 @@ const handleLogin = async (req, res) => {
             }
         );
 
+        const newRefreshTokenArray = !cookies?.jwt
+            ? foundUser.refreshToken
+            : foundUser.refreshToken.filter(rt => rt !== cookies.jwt);
+
+        if (cookies?.jwt) {
+            const refreshToken = cookies.jwt;
+            const foundToken = await User.findOne({ refreshToken }).exec();
+
+            // Detected refresh token reuse!
+            if (!foundToken) {
+                console.log('attempted refresh token reuse at login!');
+                // Clear out All previous refresh tokens
+                newRefreshTokenArray = [];
+            }
+
+            res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+        }
+
         // Saving refreshToken with current user
-        foundUser.refreshToken = refreshToken;
+        foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
         const result = await foundUser.save();
         console.log(result);
 
-        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true }); // secure: true - only serves on https
+        res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true }); // secure: true - only serves on https
 
         res.json({ accessToken, toDoList: result.toDoList, userId: result._id });
     } else {

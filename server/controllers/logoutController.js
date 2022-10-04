@@ -13,12 +13,12 @@ const handleLogout = async (req, res) => {
     const foundUser = await User.findOne({ refreshToken }).exec();
 
     if (!foundUser) {
-        res.clearCookie('jwt', { httpOnly: true, maxAge: 24*60*60*1000 });
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
         return res.sendStatus(204);
     }
 
     // Delete refreshToken in db
-    foundUser.refreshToken = '';
+    foundUser.refreshToken = foundUser.refreshToken.filter(rt => rt !== refreshToken);
     const result = await foundUser.save();
     console.log(result)
 

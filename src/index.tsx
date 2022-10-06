@@ -7,6 +7,11 @@ import { AuthProvider } from './context/AuthProvider';
 import RequireAuthComponent from './components/RequireAuthComponent/require-auth.component';
 import ToDoListWithHookComponent from './components/ToDoListWithHooks/to-do-list-with-hook.component';
 import PersistLogin from './components/PersistLoginComponent/persist-login.component';
+import { disableReactDevTools } from '@fvilers/disable-react-devtools';
+
+if (process.env.NODE_ENV === 'production') {
+  disableReactDevTools();
+}
 
 const rooter = ReactDom.createRoot(document.getElementById('root')!);
 rooter.render(

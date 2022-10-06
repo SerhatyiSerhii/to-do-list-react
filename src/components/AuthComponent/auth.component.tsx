@@ -46,6 +46,7 @@ export function AuthComponent() {
             setNameErrors(event.target.value.trim() ? false : true);
             userAttribs.onChange(event);
         } else if (event.target.className === 'password-input') {
+            setNameErrors(name === '' ? true : false);
             setPasswordErrors(event.target.value.trim() ? false : true);
             setPassword(event.target.value.trim());
         } else {
